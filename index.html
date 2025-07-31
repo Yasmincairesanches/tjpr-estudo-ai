@@ -1,45 +1,430 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TJPR AI - Plataforma Inteligente de Estudos</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.9.1/chart.min.js"></script>
-    <!-- CSS -->
-    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TJPR AI - Plataforma Inteligente de Estudos</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Notification System -->
-    <div id="notification" class="notification"></div>
-    <!-- Floating AI Assistant -->
-    <div id="floating-ai" class="floating-ai" onclick="toggleAIChat()">🤖</div>
-    <!-- AI Chat Interface -->
-    <div id="ai-chat" class="ai-chat">
-        ... <!-- Conteúdo do chat omitido por brevidade -->
-    </div>
-    <div id="app" class="app-container mx-auto p-8 my-8">
-        <!-- Home Screen -->
-        <div id="home-screen">
-            ... <!-- Conteúdo da home omitido por brevidade -->
-        </div>
-        <!-- Questions Screen -->
-        <div id="questions-screen" class="hide">
-            ... <!-- Conteúdo das questões omitido por brevidade -->
-        </div>
-        <!-- Pomodoro Screen -->
-        <div id="pomodoro-screen" class="hide">
-            ... <!-- Conteúdo do pomodoro omitido por brevidade -->
-        </div>
-        <!-- Simulados Screen -->
-        <div id="simulados-screen" class="hide">
-            ... <!-- Conteúdo do simulado a ser preenchido -->
-        </div>
-    </div>
-    <!-- Scripts -->
-    <script src="scripts.js"></script>
+        <div id="notification" class="notification"></div>
+    
+        <div id="achievement-popup" class="achievement-popup">
+        <div class="flex items-center gap-3">
+            <div class="text-2xl">🏆</div>
+            <div>
+                <div class="font-bold">Conquista Desbloqueada!</div>
+                <div id="achievement-text" class="text-sm opacity-90"></div>
+            </div>
+        </div>
+    </div>
+
+        <div id="floating-ai" class="floating-ai" onclick="toggleAIChat()">
+        🤖
+    </div>
+
+        <div id="ai-chat" class="ai-chat">
+        <div class="p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    🤖
+                </div>
+                <div>
+                    <div class="font-bold">Juris AI</div>
+                    <div class="text-xs opacity-90">Seu assistente inteligente</div>
+                </div>
+                <button onclick="toggleAIChat()" class="ml-auto text-xl">×</button>
+            </div>
+        </div>
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto" style="height: 360px;">
+            <div class="bg-gray-100 p-3 rounded-lg mb-3">
+                <div class="text-sm text-gray-600 mb-1">Juris AI</div>
+                <div>Olá! 👋 Sou seu assistente inteligente. Como posso ajudar nos seus estudos hoje?</div>
+            </div>
+        </div>
+        <div class="p-4 border-t">
+            <div class="flex gap-2">
+                <input id="chat-input" type="text" placeholder="Digite sua pergunta..." class="flex-1 p-2 border rounded-lg text-sm">
+                <button onclick="sendMessage()" class="btn-ai px-4 py-2 text-sm">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" class="app-container mx-auto p-8 my-8">
+                <div id="home-screen">
+                        <div class="countdown-container">
+                <h1 class="text-5xl font-black mb-4">🏛️ TJPR AI Platform</h1>
+                <p class="text-xl mb-6 opacity-90">Inteligência Artificial para sua Aprovação</p>
+                <div class="flex justify-center items-center space-x-12">
+                    <div>
+                        <div id="days-left" class="countdown-number">--</div>
+                        <div class="text-sm font-semibold opacity-80">DIAS</div>
+                    </div>
+                    <div>
+                        <div id="hours-left" class="countdown-number">--</div>
+                        <div class="text-sm font-semibold opacity-80">HORAS</div>
+                    </div>
+                    <div>
+                        <div id="minutes-left" class="countdown-number">--</div>
+                        <div class="text-sm font-semibold opacity-80">MINUTOS</div>
+                    </div>
+                </div>
+            </div>
+
+                        <div class="card p-6 mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-4">
+                        <div class="level-badge">
+                            <span>⭐</span>
+                            <span id="user-level">Nível 1 - Iniciante</span>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <span id="current-xp">0</span> / <span id="next-level-xp">100</span> XP
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold" id="total-xp">0 XP</div>
+                        <div class="text-sm text-gray-600">Total acumulado</div>
+                    </div>
+                </div>
+                <div class="xp-bar">
+                    <div id="xp-fill" class="xp-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+                        <div id="motivational-quote" class="ai-card p-6 mb-8 text-center">
+                <div class="flex items-center justify-center gap-3 mb-3">
+                    <span class="text-2xl">🧠</span>
+                    <span class="font-bold">Dica Inteligente do Dia</span>
+                </div>
+                <p class="text-xl font-medium italic">"A IA está analisando seu progresso..."</p>
+            </div>
+
+                        <div class="card p-8 mb-8 text-center">
+                <h3 class="text-2xl font-bold mb-6">🎯 Análise Preditiva de Aprovação</h3>
+                <div class="prediction-meter mb-6">
+                    <div class="prediction-score" id="approval-probability">85%</div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <div class="font-bold text-green-600">Pontos Fortes</div>
+                        <div id="strong-subjects">Português, Direito Civil</div>
+                    </div>
+                    <div>
+                        <div class="font-bold text-red-600">Precisa Melhorar</div>
+                        <div id="weak-subjects">Informática, Matemática</div>
+                    </div>
+                    <div>
+                        <div class="font-bold text-blue-600">Próxima Meta</div>
+                        <div id="next-goal">20 questões de Informática</div>
+                    </div>
+                </div>
+            </div>
+
+                        <div class="stats-grid mb-8">
+                <div class="card gradient-card p-6 text-center">
+                    <div class="text-4xl mb-3">📊</div>
+                    <h3 class="text-lg font-bold mb-2">Questões Totais</h3>
+                    <p id="total-questions-stat" class="text-4xl font-black">0</p>
+                    <p class="text-sm opacity-80 mt-2">+<span id="questions-today">0</span> hoje</p>
+                </div>
+
+                <div class="card p-6 text-center" style="background: var(--success); color: white;">
+                    <div class="text-4xl mb-3">🎯</div>
+                    <h3 class="text-lg font-bold mb-2">Taxa de Acerto</h3>
+                    <p id="accuracy-rate-stat" class="text-4xl font-black">0%</p>
+                    <p class="text-sm opacity-80 mt-2">Meta: 80%</p>
+                </div>
+
+                <div class="card p-6 text-center" style="background: var(--secondary); color: white;">
+                    <div class="text-4xl mb-3">🔥</div>
+                    <h3 class="text-lg font-bold mb-2">Sequência</h3>
+                    <p id="current-streak-stat" class="text-4xl font-black">0</p>
+                    <p class="text-sm opacity-80 mt-2">dias consecutivos</p>
+                </div>
+
+                <div class="card p-6 text-center" style="background: var(--warning); color: white;">
+                    <div class="text-4xl mb-3">⏱️</div>
+                    <h3 class="text-lg font-bold mb-2">Tempo Estudado</h3>
+                    <p id="study-time-stat" class="text-4xl font-black">0h</p>
+                    <p class="text-sm opacity-80 mt-2">esta semana</p>
+                </div>
+            </div>
+
+                        <div class="card p-6 mb-8">
+                <h3 class="text-xl font-bold mb-4">🔥 Mapa de Calor - Performance por Matéria</h3>
+                <div id="heat-map" class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                    </div>
+            </div>
+
+                        <div class="menu-grid">
+                <div onclick="showScreen('ai-study-screen')" class="card p-8 cursor-pointer text-center ai-card">
+                    <div class="text-6xl mb-4">🤖</div>
+                    <h2 class="text-2xl font-bold mb-3">Estudo Inteligente</h2>
+                    <p class="opacity-90">IA personaliza seu plano de estudos</p>
+                </div>
+
+                <div onclick="showScreen('questions-screen')" class="card p-8 cursor-pointer text-center">
+                    <div class="text-6xl mb-4">❓</div>
+                    <h2 class="text-2xl font-bold mb-3">500+ Questões</h2>
+                    <p class="text-gray-600">Banco completo com IA adaptativa</p>
+                </div>
+
+                <div onclick="showScreen('simulados-screen')" class="card p-8 cursor-pointer text-center">
+                    <div class="text-6xl mb-4">📋</div>
+                    <h2 class="text-2xl font-bold mb-3">Simulados TJPR</h2>
+                    <p class="text-gray-600">Formato exato da prova oficial</p>
+                </div>
+
+                <div onclick="showScreen('pomodoro-screen')" class="card p-8 cursor-pointer text-center">
+                    <div class="text-6xl mb-4">⏰</div>
+                    <h2 class="text-2xl font-bold mb-3">Pomodoro Pro</h2>
+                    <p class="text-gray-600">Timer inteligente com estatísticas</p>
+                </div>
+
+                <div onclick="showScreen('schedule-screen')" class="card p-8 cursor-pointer text-center">
+                    <div class="text-6xl mb-4">📅</div>
+                    <h2 class="text-2xl font-bold mb-3">Cronograma IA</h2>
+                    <p class="text-gray-600">Planejamento automatizado</p>
+                </div>
+
+                <div onclick="showScreen('laws-screen')" class="card p-8 cursor-pointer text-center">
+                    <div class="text-6xl mb-4">⚖️</div>
+                    <h2 class="text-2xl font-bold mb-3">Leis Inteligentes</h2>
+                    <p class="text-gray-600">Busca avançada e favoritos</p>
+                </div>
+            </div>
+        </div>
+
+                <div id="ai-study-screen" class="hide">
+            <button onclick="showScreen('home-screen')" class="btn-primary mb-6">← Voltar</button>
+            
+            <div class="ai-card p-8 text-center mb-8">
+                <h2 class="text-4xl font-bold mb-4">🤖 Estudo Inteligente</h2>
+                <p class="text-xl opacity-90 mb-6">A IA analisou seu desempenho e criou um plano personalizado</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                    <div class="bg-white bg-opacity-20 p-6 rounded-xl">
+                        <h3 class="font-bold text-lg mb-3">📈 Seu Nível Atual</h3>
+                        <div class="text-3xl font-black mb-2" id="ai-current-level">Intermediário</div>
+                        <div class="text-sm opacity-80">Com base em 0 questões respondidas</div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-6 rounded-xl">
+                        <h3 class="font-bold text-lg mb-3">🎯 Recomendação IA</h3>
+                        <div class="text-lg mb-2" id="ai-recommendation">Foque em Direito Processual</div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-6 rounded-xl">
+                        <h3 class="font-bold text-lg mb-3">⏳ Tempo Estimado</h3>
+                        <div class="text-3xl font-black mb-2" id="ai-time-estimate">45 dias</div>
+                        <div class="text-sm opacity-80">Para atingir 85% de acerto</div>
+                    </div>
+                </div>
+
+                <button onclick="startAIStudyPlan()" class="btn-primary text-xl px-8 py-4 mt-8">🚀 Iniciar Plano IA</button>
+            </div>
+
+                        <div id="ai-study-plan" class="hide">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold mb-4">📚 Próximas Ações</h3>
+                        <div id="ai-next-actions" class="space-y-3">
+                                                    </div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold mb-4">📊 Progresso Previsto</h3>
+                        <canvas id="ai-progress-chart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+                <div id="pomodoro-screen" class="hide">
+            <button onclick="showScreen('home-screen')" class="btn-primary mb-6">← Voltar</button>
+            
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold mb-4">⏰ Pomodoro Inteligente</h2>
+                
+                <div class="pomodoro-timer mb-8">
+                    <div class="timer-circle">
+                        <div class="text-center">
+                            <div id="timer-display" class="timer-display">25:00</div>
+                            <div id="timer-mode" class="text-lg font-bold opacity-80">FOCO</div>
+                        </div>
+                    </div>
+                    <div id="timer-session" class="text-xl font-bold mb-4">Sessão 1 de 4</div>
+                    <div id="current-subject-display" class="text-lg mb-6 opacity-90">Matéria: Não selecionada</div>
+                    
+                    <div class="flex justify-center space-x-4 mb-6">
+                        <button id="start-timer" onclick="startPomodoro()" class="btn-primary text-lg px-8 py-4">▶️ Iniciar</button>
+                        <button id="pause-timer" onclick="pausePomodoro()" class="btn-primary text-lg px-8 py-4 hide">⏸️ Pausar</button>
+                        <button onclick="resetPomodoro()" class="btn-primary bg-gray-500 text-lg px-6 py-4">🔄 Resetar</button>
+                    </div>
+                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold mb-4">📚 Configuração de Estudo</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Matéria Atual:</label>
+                                <select id="current-subject" class="w-full p-3 border border-gray-300 rounded-lg bg-white">
+                                    <option value="">Selecione uma matéria</option>
+                                    <option value="Língua Portuguesa">Língua Portuguesa</option>
+                                    <option value="Direito Constitucional">Direito Constitucional</option>
+                                    <option value="Direito Administrativo">Direito Administrativo</option>
+                                    <option value="Direito Civil">Direito Civil</option>
+                                    <option value="Direito Processual Civil">Direito Processual Civil</option>
+                                    <option value="Direito Penal">Direito Penal</option>
+                                    <option value="Direito Processual Penal">Direito Processual Penal</option>
+                                    <option value="Informática">Informática</option>
+                                    <option value="Raciocínio Lógico">Raciocínio Lógico</option>
+                                    <option value="Matemática">Matemática</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Objetivo da Sessão:</label>
+                                <input id="session-goal" type="text" placeholder="Ex: Revisar contratos" class="w-full p-3 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold mb-4">⚙️ Configurações de Tempo</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <label class="text-sm font-medium">Tempo de Foco:</label>
+                                <div class="flex items-center space-x-2">
+                                    <input id="focus-time" type="range" min="15" max="60" value="25" class="w-24">
+                                    <span id="focus-time-value">25</span> min
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <label class="text-sm font-medium">Pausa Curta:</label>
+                                <div class="flex items-center space-x-2">
+                                    <input id="short-break-time" type="range" min="5" max="15" value="5" class="w-24">
+                                    <span id="short-break-time-value">5</span> min
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <label class="text-sm font-medium">Pausa Longa:</label>
+                                <div class="flex items-center space-x-2">
+                                    <input id="long-break-time" type="range" min="15" max="30" value="15" class="w-24">
+                                    <span id="long-break-time-value">15</span> min
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+                <div id="questions-screen" class="hide">
+            <button onclick="showScreen('home-screen')" class="btn-primary mb-6">← Voltar</button>
+            <h2 class="text-4xl font-bold mb-6">❓ Questões Adaptativas</h2>
+
+            <div class="card p-6 mb-6">
+                <h3 class="text-xl font-bold mb-4">Filtros</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Matéria:</label>
+                        <select id="questions-subject" class="w-full p-3 border border-gray-300 rounded-lg">
+                            <option value="all">Todas as Matérias</option>
+                            <option value="Língua Portuguesa">Língua Portuguesa</option>
+                            <option value="Direito Constitucional">Direito Constitucional</option>
+                            <option value="Direito Administrativo">Direito Administrativo</option>
+                            <option value="Direito Civil">Direito Civil</option>
+                            <option value="Direito Processual Civil">Direito Processual Civil</option>
+                            <option value="Direito Penal">Direito Penal</option>
+                            <option value="Direito Processual Penal">Direito Processual Penal</option>
+                            <option value="Informática">Informática</option>
+                            <option value="Raciocínio Lógico">Raciocínio Lógico</option>
+                            <option value="Matemática">Matemática</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Dificuldade:</label>
+                        <select id="questions-difficulty" class="w-full p-3 border border-gray-300 rounded-lg">
+                            <option value="all">Todas as Dificuldades</option>
+                            <option value="Fácil">Fácil</option>
+                            <option value="Médio">Médio</option>
+                            <option value="Difícil">Difícil</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="loadQuestions()" class="btn-primary w-full text-center">🔎 Buscar Questões</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="questions-list" class="space-y-6">
+                            </div>
+            
+            <div id="questions-loading" class="text-center mt-8 hide">
+                <div class="loading-spinner mx-auto"></div>
+                <div class="mt-4 text-lg">Carregando questões inteligentes...</div>
+            </div>
+        </div>
+        
+                <div id="simulados-screen" class="hide">
+            <button onclick="showScreen('home-screen')" class="btn-primary mb-6">← Voltar</button>
+            <h2 class="text-4xl font-bold mb-6">📋 Simulados TJPR</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="card p-6 text-center cursor-pointer hover:bg-gray-50" onclick="startSimulado('oficial')">
+                    <div class="text-5xl mb-4">📜</div>
+                    <h3 class="text-xl font-bold mb-2">Simulado Oficial</h3>
+                    <p class="text-gray-600">Baseado no último edital</p>
+                </div>
+                <div class="card p-6 text-center cursor-pointer hover:bg-gray-50" onclick="startSimulado('adaptativo')">
+                    <div class="text-5xl mb-4">🧠</div>
+                    <h3 class="text-xl font-bold mb-2">Simulado Adaptativo IA</h3>
+                    <p class="text-gray-600">Focado nos seus pontos fracos</p>
+                </div>
+                <div class="card p-6 text-center cursor-pointer hover:bg-gray-50" onclick="showSimuladoHistory()">
+                    <div class="text-5xl mb-4">⏱️</div>
+                    <h3 class="text-xl font-bold mb-2">Histórico de Simulados</h3>
+                    <p class="text-gray-600">Veja seu progresso</p>
+                </div>
+            </div>
+        </div>
+
+                <div id="laws-screen" class="hide">
+            <button onclick="showScreen('home-screen')" class="btn-primary mb-6">← Voltar</button>
+            <h2 class="text-4xl font-bold mb-6">⚖️ Leis Inteligentes</h2>
+
+            <div class="card p-6 mb-6">
+                <h3 class="text-xl font-bold mb-4">Pesquisa</h3>
+                <div class="flex gap-4">
+                    <input id="law-search-input" type="text" placeholder="Buscar por termo ou artigo..." class="flex-1 p-3 border rounded-lg">
+                    <button onclick="searchLaws()" class="btn-primary">Buscar</button>
+                </div>
+            </div>
+            <div id="laws-content" class="card p-6">
+                <div class="text-center text-gray-500">Selecione uma lei para começar a ler ou use a barra de pesquisa acima.</div>
+            </div>
+        </div>
+
+                <div id="schedule-screen" class="hide">
+            <button onclick="showScreen('home-screen')" class="btn-primary mb-6">← Voltar</button>
+            <h2 class="text-4xl font-bold mb-6">📅 Cronograma IA</h2>
+            <div class="card p-6 text-center">
+                <div class="text-5xl mb-4">🚧</div>
+                <h3 class="text-2xl font-bold mb-2">Em Construção</h3>
+                <p class="text-gray-600">Esta funcionalidade estará disponível em breve com um cronograma de estudos totalmente automatizado pela nossa IA.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.9.1/chart.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
